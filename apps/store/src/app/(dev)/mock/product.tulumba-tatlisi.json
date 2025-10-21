@@ -1,0 +1,37 @@
+{
+  "id": "p1",
+  "name": "Tulumba Tatlısı",
+  "slug": "tulumba-tatlisi",
+  "description": "Tek kişilik klasik tulumba tatlısı. Taze hazırlanmış, çıtır dış kabuğu ve yumuşak içiyle mükemmel lezzet.",
+  "images": [
+    {
+      "url": "/media/products/tulumba-tatlisi-1.jpg",
+      "alt": "Tulumba tatlısı"
+    },
+    {
+      "url": "/media/products/tulumba-tatlisi-2.jpg",
+      "alt": "Tulumba tatlısı detay"
+    }
+  ],
+  "price_from": 120,
+  "price_to": 220,
+  "is_variable": true,
+  "variants": [
+    {
+      "id": "v1",
+      "sku": "TUL-0001-W0500",
+      "attrs": {
+        "weight": 0.5
+      },
+      "price": 120
+    },
+    {
+      "id": "v2",
+      "sku": "TUL-0001-W1000",
+      "attrs": {
+        "weight": 1
+      },
+      "price": 220
+    }
+  ]
+}
