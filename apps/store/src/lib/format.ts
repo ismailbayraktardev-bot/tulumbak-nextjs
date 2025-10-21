@@ -1,2 +1,2 @@
 // Re-export shared utilities for convenience
-export * from '@tulumbak/shared'
+export * from 'tulumbak-shared'

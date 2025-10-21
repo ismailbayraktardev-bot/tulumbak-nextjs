@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Merriweather, Lato, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Sidebar } from "@/components/admin/sidebar";
+import { Topbar } from "@/components/admin/topbar";
 
 const merriweather = Merriweather({
   variable: "--font-merriweather",
@@ -34,7 +36,18 @@ export default function RootLayout({
       <body
         className={`${merriweather.variable} ${lato.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="flex h-screen bg-gray-100">
+          {/* Sidebar */}
+          <Sidebar />
+          
+          {/* Main content */}
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <Topbar />
+            <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+              {children}
+            </main>
+          </div>
+        </div>
       </body>
     </html>
   );

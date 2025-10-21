@@ -37,7 +37,10 @@ export interface ProductSummary {
   id: string
   name: string
   slug: string
-  image: ProductImage | null
+  image?: {
+    url: string
+    alt?: string
+  }
   price_from: number
   price_to: number
   is_variable: boolean

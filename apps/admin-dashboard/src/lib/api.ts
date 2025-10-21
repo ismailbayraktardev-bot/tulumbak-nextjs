@@ -3,7 +3,11 @@ import { ApiResponse, PaginatedResponse } from 'tulumbak-shared'
 export async function apiGet<T>(path: string, revalidate = 60): Promise<T> {
   const base = process.env.NEXT_PUBLIC_API_URL!
   const res = await fetch(`${base}${path}`, {
-    headers: { accept: 'application/json' },
+    headers: { 
+      accept: 'application/json',
+      // TODO: JWT token ekle (FE-02)
+      // 'Authorization': `Bearer ${token}`
+    },
     next: { revalidate }
   })
   if (!res.ok) throw new Error(`${res.status} GET ${path}`)
@@ -16,7 +20,9 @@ export async function apiPost<T>(path: string, data: any): Promise<T> {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
-      accept: 'application/json'
+      accept: 'application/json',
+      // TODO: JWT token ekle (FE-02)
+      // 'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify(data)
   })
@@ -30,7 +36,9 @@ export async function apiPut<T>(path: string, data: any): Promise<T> {
     method: 'PUT',
     headers: { 
       'Content-Type': 'application/json',
-      accept: 'application/json'
+      accept: 'application/json',
+      // TODO: JWT token ekle (FE-02)
+      // 'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify(data)
   })
@@ -42,7 +50,11 @@ export async function apiDelete<T>(path: string): Promise<T> {
   const base = process.env.NEXT_PUBLIC_API_URL!
   const res = await fetch(`${base}${path}`, {
     method: 'DELETE',
-    headers: { accept: 'application/json' }
+    headers: { 
+      accept: 'application/json',
+      // TODO: JWT token ekle (FE-02)
+      // 'Authorization': `Bearer ${token}`
+    }
   })
   if (!res.ok) throw new Error(`${res.status} DELETE ${path}`)
   return res.json() as Promise<T>

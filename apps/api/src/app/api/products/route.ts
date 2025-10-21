@@ -229,3 +229,136 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+// PUT /api/products - Update existing product
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { id, name, category_id, description, price, stock_qty, images, is_active } = body
+
+    // Basic validation
+    if (!id || !name || !category_id) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'ID, name and category_id are required' } },
+        { status: 400 }
+      )
+    }
+
+    // Generate slug if not provided
+    const slug = body.slug || name.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+
+    const updateQuery = `
+      UPDATE products
+      SET name = $1, slug = $2, category_id = $3, description = $4, price = $5,
+          stock_qty = $6, images = $7, is_active = $8, updated_at = NOW()
+      WHERE id = $9
+      RETURNING *
+    `
+
+    const values = [
+      name, slug, category_id, description || null, price || null,
+      stock_qty || null, images || null, is_active !== undefined ? is_active : true, id
+    ]
+
+    try {
+      const result = await query(updateQuery, values)
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { success: false, error: { code: 'NOT_FOUND', message: 'Product not found' } },
+          { status: 404 }
+        )
+      }
+
+      const product = result.rows[0]
+
+      // Get category details
+      const categoryQuery = `
+        SELECT id, name, slug FROM categories WHERE id = $1
+      `
+      const categoryResult = await query(categoryQuery, [category_id])
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          ...product,
+          category: categoryResult.rows[0] || null
+        } as Product
+      })
+    } catch (error: any) {
+      console.error('Error updating product:', error)
+
+      if (error.code === '23505') {
+        return NextResponse.json(
+          { success: false, error: { code: 'DUPLICATE_SLUG', message: 'Product with this slug already exists' } },
+          { status: 409 }
+        )
+      }
+
+      return NextResponse.json(
+        { success: false, error: { code: 'DATABASE_ERROR', message: 'Failed to update product' } },
+        { status: 500 }
+      )
+    }
+  } catch (error) {
+    console.error('Unexpected error:', error)
+    return NextResponse.json(
+      { success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal server error' } },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE /api/products - Delete product
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Product ID is required' } },
+        { status: 400 }
+      )
+    }
+
+    // Check if product exists in any cart
+    const cartCheckQuery = `
+      SELECT COUNT(*) as count FROM cart_items WHERE product_id = $1
+    `
+    const cartResult = await query(cartCheckQuery, [id])
+
+    if (parseInt(cartResult.rows[0].count) > 0) {
+      return NextResponse.json(
+        { success: false, error: { code: 'CONFLICT', message: 'Cannot delete product: exists in active carts' } },
+        { status: 409 }
+      )
+    }
+
+    // Delete product
+    const deleteQuery = `DELETE FROM products WHERE id = $1 RETURNING id`
+    const result = await query(deleteQuery, [id])
+
+    if (result.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: { code: 'NOT_FOUND', message: 'Product not found' } },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: { id: result.rows[0].id, deleted: true }
+    })
+  } catch (error) {
+    console.error('Unexpected error:', error)
+    return NextResponse.json(
+      { success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal server error' } },
+      { status: 500 }
+    )
+  }
+}
