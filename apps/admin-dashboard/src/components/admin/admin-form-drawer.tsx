@@ -1,6 +1,6 @@
-import { AdminFormDrawer as AdminFormDrawerType } from 'tulumbak-shared'
+import { AdminFormDrawerProps as AdminFormDrawerType } from 'tulumbak-shared'
 
-interface AdminFormDrawerProps extends AdminFormDrawerType {}
+type AdminFormDrawerProps = AdminFormDrawerType
 
 export function AdminFormDrawer({ 
   open, 
@@ -37,7 +37,7 @@ export function AdminFormDrawer({
             <div className="text-center py-8 text-gray-500">
               <p>AdminFormDrawer bileşeni henüz implement edilmedi.</p>
               <p className="text-sm mt-2">
-                FE-02'de React Hook Form + Zod entegrasyonu yapılacak.
+                FE-02&apos;de React Hook Form + Zod entegrasyonu yapılacak.
               </p>
               <div className="mt-4 text-xs text-gray-400">
                 <p>Title: {title}</p>

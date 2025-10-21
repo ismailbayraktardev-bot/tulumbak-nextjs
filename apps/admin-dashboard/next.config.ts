@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Standalone output for Docker
-  output: 'standalone',
+  // Standalone output for Docker (disabled for Windows build)
+  // output: 'standalone',
 
   // Base path for admin dashboard
   basePath: '/admin',
@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   assetPrefix: '/admin',
 
   // Performance optimizations
-  swcMinify: true,
   poweredByHeader: false,
 
   // Environment variables
@@ -49,8 +48,19 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
-    domains: ['localhost'],
+    remotePatterns: [
+      { protocol: 'http', hostname: 'localhost' },
+    ],
     unoptimized: true, // For Docker compatibility
+    formats: ['image/webp', 'image/avif'],
+  },
+
+  // External packages
+  serverExternalPackages: ['pg', 'redis'],
+
+  // Experimental features
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
   },
 };
 

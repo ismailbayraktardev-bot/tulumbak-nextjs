@@ -150,6 +150,38 @@ Hata mesajları (örnek):
 - `next/image` ürün küçük resimleri; minimal JS.
 - Form yaprak bileşenleri `dynamic()` (modaller, kupon).
 
+### 8.1. Form Validation Foundation (FE-02)
+
+**CheckoutFormProvider Setup**
+- **RHF + Zod integration**: Form state management across all steps
+- **Context-based**: `useCheckoutForm()` hook for step navigation
+- **Turkish validation messages**: User-friendly error feedback
+
+**Form Schema Structure**
+```typescript
+const checkoutFormSchema = z.object({
+  contact: z.object({
+    first_name: z.string().min(1, "Ad zorunludur."),
+    last_name: z.string().min(1, "Soyad zorunludur."),
+    email: z.string().email("Geçerli bir e-posta adresi girin."),
+    phone: z.string().min(10, "Telefon numarası zorunludur."),
+  }),
+  // ... address, delivery, billing, payment steps
+});
+```
+
+**Implementation Status**
+- ✅ **Form Provider**: `CheckoutFormProvider` wrapping all steps
+- ✅ **Step Navigation**: Context-based step management
+- ✅ **Validation**: Zod schema with Turkish error messages
+- ✅ **Form Connection**: Each step connected via RHF context
+- 🔄 **Submit Logic**: Console mock; real API planned for FE-03
+
+**Next Step → FE-03**
+- Real API integration for order creation
+- PayTR payment flow integration
+- Address validation and zone checking
+
 ---
 
 ## 9) Güvenlik & Uyumluluk

@@ -1,23 +1,66 @@
 import { AdminDataTable } from '@/components/admin/admin-data-table'
-import { Button } from 'tulumbak-ui'
+import { AdminDataTableColumn } from 'tulumbak-shared'
+import { apiGet } from '@/lib/api'
+import { Product, ApiResponse } from 'tulumbak-shared'
+import { Badge, Button } from 'tulumbak-ui'
+import Image from 'next/image'
 
-export default function ProductsPage() {
-  // Mock product data
-  const products = [
-    { id: '1', name: 'Tulumba Tatlısı', category: 'Tulumbalar', price: '₺120', stock: '50', status: 'Aktif', created: '2024-10-21' },
-    { id: '2', name: 'Soğuk Baklava', category: 'Baklavalar', price: '₺390', stock: '25', status: 'Aktif', created: '2024-10-20' },
-    { id: '3', name: 'Künefe', category: 'Tulumbalar', price: '₺280', stock: '30', status: 'Aktif', created: '2024-10-19' },
-    { id: '4', name: 'Kazandibi', category: 'Sütlaçlar', price: '₺180', stock: '0', status: 'Pasif', created: '2024-10-18' },
-  ]
+export default async function ProductsPage() {
+  // Live API data
+  let products: Product[] = []
+  try {
+    const response = await apiGet<ApiResponse<Product[]>>('/products', 30)
+    products = response.data || []
+  } catch (error) {
+    console.error('Ürünler yüklenirken hata:', error)
+  }
 
-  const columns = [
-    { key: 'id', title: 'ID', sortable: true },
-    { key: 'name', title: 'Ürün Adı', sortable: true },
-    { key: 'category', title: 'Kategori', sortable: true },
-    { key: 'price', title: 'Fiyat', sortable: true },
-    { key: 'stock', title: 'Stok', sortable: true },
-    { key: 'status', title: 'Durum', sortable: true },
-    { key: 'created', title: 'Oluşturulma', sortable: true }
+  const columns: AdminDataTableColumn[] = [
+    { 
+      key: 'name' as const, 
+      title: 'Ürün Adı', 
+      sortable: true,
+      render: (value, row) => (
+        <div className="flex items-center gap-2">
+          <Image 
+            src={row.image?.url || '/placeholder.jpg'} 
+            alt="" 
+            width={40} 
+            height={40} 
+            className="rounded" 
+          />
+          <span>{value}</span>
+        </div>
+      )
+    },
+    { key: 'category' as const, title: 'Kategori', sortable: true },
+    { 
+      key: 'price_from' as const, 
+      title: 'Fiyat', 
+      sortable: true,
+      render: (value) => `₺${value}`
+    },
+    { key: 'stock' as const, title: 'Stok', sortable: true },
+    { 
+      key: 'status' as const, 
+      title: 'Durum', 
+      sortable: true,
+      render: (value) => (
+        <Badge variant={value === 'active' ? 'default' : 'secondary'}>
+          {value === 'active' ? 'Aktif' : 'Pasif'}
+        </Badge>
+      )
+    },
+    { 
+      key: 'id' as const, 
+      title: 'Aksiyonlar', 
+      sortable: false,
+      render: () => (
+        <Button variant="ghost" size="sm">
+          Düzenle
+        </Button>
+      )
+    }
   ]
 
   return (

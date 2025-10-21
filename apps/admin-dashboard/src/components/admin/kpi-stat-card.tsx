@@ -1,7 +1,7 @@
 import { Card, CardContent } from 'tulumbak-ui'
 import { KPIStatCard as KPIStatCardType } from 'tulumbak-shared'
 
-interface KPIStatCardProps extends KPIStatCardType {}
+type KPIStatCardProps = KPIStatCardType
 
 export function KPIStatCard({ title, value, delta, description }: KPIStatCardProps) {
   return (

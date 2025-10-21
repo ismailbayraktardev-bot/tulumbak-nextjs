@@ -1,14 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Standalone output for Docker
-  output: 'standalone',
+  // Standalone output for Docker (disabled for Windows build)
+  // output: 'standalone',
 
   // Base path for store
   basePath: '',
 
   // Performance optimizations
-  swcMinify: true,
   poweredByHeader: false,
 
   // Environment variables
@@ -65,7 +64,11 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
-    domains: ['localhost', 'cdn.tulumbak.com', 'images.tulumbak.com'],
+    remotePatterns: [
+      { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: 'cdn.tulumbak.com' },
+      { protocol: 'https', hostname: 'images.tulumbak.com' },
+    ],
     unoptimized: true, // For Docker compatibility
     formats: ['image/webp', 'image/avif'],
   },
@@ -73,10 +76,12 @@ const nextConfig: NextConfig = {
   // Compression
   compress: true,
 
+  // External packages
+  serverExternalPackages: ['pg', 'redis'],
+
   // Experimental features
   experimental: {
-    optimizePackageImports: ['@heroicons/react', 'lucide-react'],
-    serverComponentsExternalPackages: ['pg', 'redis'],
+    optimizePackageImports: ['lucide-react'],
   },
 };
 

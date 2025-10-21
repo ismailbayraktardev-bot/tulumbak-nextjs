@@ -243,6 +243,34 @@ pnpm run gen section ProductGrid
 - [ ] TL formatları doğru  
 - [ ] LCP < 2.5s, CLS < 0.1
 
+### 12.1. Image & Responsiveness Implementation (FE-02)
+
+**Next.js Image Migration**
+- All product/hero/category visuals now use `next/image`
+- **Ratios**: ProductCard 3:2 · Hero 16:9 · CategoryTile 4:3
+- **sizes attribute**:
+  - Cards: `(max-width:640px)100vw,(max-width:1024px)50vw,33vw`
+  - Hero: `100vw`
+- **Loading strategy**: Default `loading="lazy"`; Hero `priority={true}`
+
+**Hover/Transition Polish**
+- **Duration**: 250ms `ease-in-out`
+- **Effects**: 
+  - Opacity: `80→100` on hover
+  - Transform: `translate-y-[1px]` lift effect
+  - Scale: `group-hover:scale-105` for images
+- **Touch optimization**: `touch-action-manipulation` for better mobile experience
+
+**Skeleton & Loading States**
+- **Suspense boundaries**: Each grid wrapped with `<Suspense>`
+- **Components**: `ProductCardSkeleton`, `ProductGridSkeleton`, `CategoryTilesSkeleton`
+- **Implementation**: `animate-pulse` with proper aspect ratios
+
+**Responsive Breakpoints**
+- **Grid columns**: `sm:1 md:2 lg:3` (configurable via props)
+- **Touch targets**: Minimum 44px for mobile accessibility
+- **Image optimization**: WebP/AVIF formats with fallbacks
+
 ---
 
 ## 13) Sonraki Adımlar

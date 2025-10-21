@@ -143,7 +143,32 @@ Sol sabit **Sidebar** aşağıdaki gruplar ile gelir. Üst bar sticky.
 - **Satır yoğunluğu**: rahat; zebra opsiyonel.  
 - **Durum rozetleri**:  
   - `pending` gray, `confirmed` blue, `preparing` amber, `ready` amber/600, `on_delivery` sky, `delivered` green, `cancelled|failed` red.  
-- **A11y**: Klavye navigasyon, `aria-sort`, focus ring; modal’larda focus trap & escape; ikonlu butonlarda `aria-label`.
+- **A11y**: Klavye navigasyon, `aria-sort`, focus ring; modal'larda focus trap & escape; ikonlu butonlarda `aria-label`.
+
+### 7.1. TanStack Table Implementation (FE-02)
+
+**Implemented Features**
+- **Pagination** · **Sorting** · **Search**
+- **Column visibility toggle**
+- **Filters** (Select / Text)
+- **Row selection**
+- **Data fetch via API** (`/admin/products`, `/admin/categories`)
+
+**Components**
+- **`useDataTable` hook**: State + query sync management
+- **`AdminDataTable` component**: Full table implementation with TanStack Table
+- **`AdminFormDrawer` shell**: For CRUD operations (placeholder)
+- **Toast notifications**: Success/error feedback
+
+**Server-side Integration**
+- URL parameter synchronization (`?page=1&q=search&sort=name:asc`)
+- Automatic re-fetch on filter changes
+- Optimistic UI updates for better UX
+
+**Next Step (FE-03)**
+- Drawer → real mutations (POST/PUT/DELETE)
+- Inline edit & bulk actions
+- Export CSV/Excel support
 
 ---
 

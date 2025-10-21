@@ -1,45 +1,116 @@
-import { Card, CardContent, CardHeader, CardTitle } from 'tulumbak-ui'
-import { AdminDataTable as AdminDataTableType } from 'tulumbak-shared'
+'use client'
+import { ColumnDef, flexRender } from '@tanstack/react-table'
+import { useDataTable } from './data-table/use-data-table'
+import { Button, Input } from 'tulumbak-ui'
+import { ChevronDown } from 'lucide-react'
+import { AdminDataTableProps as AdminDataTableType } from 'tulumbak-shared'
 
-interface AdminDataTableProps<T = any> extends AdminDataTableType<T> {}
+type AdminDataTableProps<T = Record<string, unknown>> = AdminDataTableType<T>
 
-export function AdminDataTable<T = any>({ 
+export function AdminDataTable<T = Record<string, unknown>>({ 
   data, 
   columns, 
-  loading = false, 
-  pagination, 
-  actions 
+  loading = false
 }: AdminDataTableProps<T>) {
+  // Convert AdminDataTableColumn to ColumnDef
+  const columnDefs: ColumnDef<T>[] = columns.map(col => ({
+    accessorKey: col.key as string,
+    header: col.title,
+    enableSorting: col.sortable,
+    cell: col.render ? info => col.render!(info.getValue(), info.row.original) : undefined,
+  }))
+  
+  const table = useDataTable(data, columnDefs)
+  
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tulumbak-amber"></div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-32">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tulumbak-amber"></div>
+      </div>
     )
   }
-
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Veri Tablosu</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-center py-8 text-gray-500">
-          <p>AdminDataTable bileşeni henüz implement edilmedi.</p>
-          <p className="text-sm mt-2">
-            FE-02'de TanStack Table entegrasyonu yapılacak.
-          </p>
-          <div className="mt-4 text-xs text-gray-400">
-            <p>Props: {data.length} satır, {columns.length} kolon</p>
-            {pagination && <p>Sayfa: {pagination.page} / {pagination.total}</p>}
-            {actions && <p>Aksiyonlar: {Object.keys(actions).join(', ')}</p>}
-          </div>
+    <div className="space-y-4">
+      {/* Search & Filters */}
+      <div className="flex items-center justify-between">
+        <Input
+          placeholder="Ara..."
+          onChange={(e) => table.setGlobalFilter(e.target.value)}
+          className="max-w-sm"
+        />
+        
+        {/* Column Visibility Dropdown - Simplified for now */}
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm">
+            Kolonlar <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-md border">
+        <table className="w-full">
+          <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <th key={header.id} className="px-4 py-3 text-left">
+                    {header.isPlaceholder ? null : (
+                      <div 
+                        className={header.column.getCanSort() ? 'cursor-pointer select-none' : ''}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {{
+                          asc: ' 🔼',
+                          desc: ' 🔽',
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </div>
+                    )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map(row => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map(cell => (
+                  <td key={cell.id} className="px-4 py-3">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length} satır seçili
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Önceki
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Sonraki
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }

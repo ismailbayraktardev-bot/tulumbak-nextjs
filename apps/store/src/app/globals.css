@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Playfair+Display:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&family=Manrope:wght@200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -42,6 +42,14 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    
+    /* Stitch Design System */
+    --stitch-primary: 28 91% 50%; /* #ec7813 */
+    --stitch-background-light: 30 25% 97%; /* #f8f7f6 */
+    --stitch-background-dark: 20 15% 10%; /* #221810 */
+    --stitch-text-primary: 20 20% 11%; /* #1b140d */
+    --stitch-text-secondary: 30 20% 39%; /* #9a704c */
+    --stitch-border-color: 35 20% 90%; /* #e7dacf */
   }
 
   .dark {
@@ -82,5 +90,10 @@
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Merriweather', serif;
+  }
+  
+  /* Tulumbak Design System Font */
+  .font-display {
+    font-family: 'Lato', sans-serif;
   }
 }

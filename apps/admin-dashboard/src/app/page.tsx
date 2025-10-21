@@ -41,12 +41,12 @@ export default function AdminDashboard() {
   ]
 
   const orderColumns = [
-    { key: 'id', title: 'ID', sortable: true },
-    { key: 'customer', title: 'Müşteri', sortable: true },
-    { key: 'product', title: 'Ürün', sortable: false },
-    { key: 'amount', title: 'Tutar', sortable: true },
-    { key: 'status', title: 'Durum', sortable: true },
-    { key: 'date', title: 'Tarih', sortable: true }
+    { key: 'id' as const, title: 'ID', sortable: true },
+    { key: 'customer' as const, title: 'Müşteri', sortable: true },
+    { key: 'product' as const, title: 'Ürün', sortable: false },
+    { key: 'amount' as const, title: 'Tutar', sortable: true },
+    { key: 'status' as const, title: 'Durum', sortable: true },
+    { key: 'date' as const, title: 'Tarih', sortable: true }
   ]
 
   return (
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
             page: 1,
             perPage: 10,
             total: 50,
-            onPageChange: (page) => console.log('Page changed:', page)
+            onPageChange: () => {}
           }}
           actions={{
             onEdit: (row) => console.log('Edit:', row),

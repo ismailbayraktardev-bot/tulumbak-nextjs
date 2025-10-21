@@ -122,7 +122,7 @@ export interface AdminDataTableColumn<T = any> {
   key: keyof T
   title: string
   sortable?: boolean
-  render?: (value: any, row: T) => React.ReactNode
+  render?: (value: any, row: T) => any
 }
 
 export interface AdminDataTableProps<T = any> {
@@ -146,7 +146,7 @@ export interface AdminFormDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
-  children: React.ReactNode
+  children: any
   onSubmit?: () => void
   onCancel?: () => void
   loading?: boolean

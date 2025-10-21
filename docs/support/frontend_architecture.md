@@ -112,9 +112,41 @@ const ProductSchema = z.object({
 
 ## 10) Performans
 - `next/image` + `sizes`; yalnız hero `priority`.
-- Kritik JS küçük: Admin’de sayfa bazlı **code‑split** (`dynamic()` modaller).
+- Kritik JS küçük: Admin'de sayfa bazlı **code‑split** (`dynamic()` modaller).
 - **HTTP cache**: Vercel edge CDN, `stale-while-revalidate` davranışı.
 - **WebP** varsayılan; AVIF opsiyonel.
+
+### 10.1. Live API Integration Layer (FE-02)
+
+**Status:** Mock→API migration complete.
+
+**Endpoints Used:**
+- `/categories` (Home, FilterBar)
+- `/products?category=slug` (PLP)
+- `/products/{slug}` (PDP)
+
+**Implementation**
+
+```typescript
+export async function apiGet<T>(path: string, revalidate = 60) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+    headers: { accept: 'application/json' },
+    next: { revalidate }
+  });
+  if (!res.ok) throw new Error(`${res.status} GET ${path}`);
+  return res.json() as Promise<T>;
+}
+```
+
+**Caching Strategy:**
+- Home/PLP: `revalidate: 60` (1 minute)
+- PDP: `revalidate: 300` (5 minutes)
+- Error handling: 404→`not-found.tsx`, 5xx→`error.tsx`
+
+**Error Handling Patterns:**
+- Graceful fallbacks for API failures
+- User-friendly error messages in Turkish
+- Console logging for debugging (development)
 
 ---
 

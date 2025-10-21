@@ -1,22 +1,49 @@
 import { AdminDataTable } from '@/components/admin/admin-data-table'
-import { Button } from 'tulumbak-ui'
+import { AdminDataTableColumn } from 'tulumbak-shared'
+import { apiGet } from '@/lib/api'
+import { Category, ApiResponse } from 'tulumbak-shared'
+import { Badge, Button } from 'tulumbak-ui'
 
-export default function CategoriesPage() {
-  // Mock category data
-  const categories = [
-    { id: '1', name: 'Tulumbalar', slug: 'tulumbalar', products: '12', status: 'Aktif', created: '2024-10-21' },
-    { id: '2', name: 'Baklavalar', slug: 'baklavalar', products: '8', status: 'Aktif', created: '2024-10-20' },
-    { id: '3', name: 'Sütlaçlar', slug: 'sutlaclar', products: '5', status: 'Aktif', created: '2024-10-19' },
-    { id: '4', name: 'Künefeler', slug: 'kunefeler', products: '3', status: 'Pasif', created: '2024-10-18' },
-  ]
+export default async function CategoriesPage() {
+  // Live API data
+  let categories: Category[] = []
+  try {
+    const response = await apiGet<ApiResponse<Category[]>>('/categories', 30)
+    categories = response.data || []
+  } catch (error) {
+    console.error('Kategoriler yüklenirken hata:', error)
+  }
 
-  const columns = [
-    { key: 'id', title: 'ID', sortable: true },
-    { key: 'name', title: 'Kategori Adı', sortable: true },
-    { key: 'slug', title: 'Slug', sortable: true },
-    { key: 'products', title: 'Ürün Sayısı', sortable: true },
-    { key: 'status', title: 'Durum', sortable: true },
-    { key: 'created', title: 'Oluşturulma', sortable: true }
+  const columns: AdminDataTableColumn[] = [
+    { key: 'id' as const, title: 'ID', sortable: true },
+    { key: 'name' as const, title: 'Kategori Adı', sortable: true },
+    { key: 'slug' as const, title: 'Slug', sortable: true },
+    { 
+      key: 'products' as const, 
+      title: 'Ürün Sayısı', 
+      sortable: true,
+      render: (value) => value || '0'
+    },
+    { 
+      key: 'status' as const, 
+      title: 'Durum', 
+      sortable: true,
+      render: (value) => (
+        <Badge variant={value === 'active' ? 'default' : 'secondary'}>
+          {value === 'active' ? 'Aktif' : 'Pasif'}
+        </Badge>
+      )
+    },
+    { 
+      key: 'id' as const, 
+      title: 'Aksiyonlar', 
+      sortable: false,
+      render: () => (
+        <Button variant="ghost" size="sm">
+          Düzenle
+        </Button>
+      )
+    }
   ]
 
   return (
