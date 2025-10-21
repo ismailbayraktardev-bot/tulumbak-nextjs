@@ -17,7 +17,10 @@
       "Bash(pkill:*)",
       "Bash(netstat:*)",
       "Bash(findstr:*)",
-      "Bash(PORT=3000 pnpm dev:*)"
+      "Bash(PORT=3000 pnpm dev:*)",
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []
