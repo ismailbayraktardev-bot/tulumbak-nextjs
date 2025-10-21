@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/postgres'
-import crypto from 'crypto'
+import { AuthService, TokenPair } from '@/lib/auth'
 
 // POST /api/auth/register - User registration
 export async function POST(request: NextRequest) {
@@ -16,6 +16,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Name validation
+    if (name.trim().length < 2 || name.trim().length > 120) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Name must be between 2 and 120 characters' } },
+        { status: 400 }
+      )
+    }
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
@@ -25,12 +33,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Password validation (min 6 characters)
+    // Password validation
     if (password.length < 6) {
       return NextResponse.json(
         { success: false, error: { code: 'VALIDATION_ERROR', message: 'Password must be at least 6 characters' } },
         { status: 400 }
       )
+    }
+
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number' } },
+        { status: 400 }
+      )
+    }
+
+    // Phone validation (optional)
+    if (phone && phone.trim()) {
+      const phoneRegex = /^\+?[\d\s\-\(\)]+$/
+      if (!phoneRegex.test(phone) || phone.replace(/\D/g, '').length < 10) {
+        return NextResponse.json(
+          { success: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid phone number' } },
+          { status: 400 }
+        )
+      }
     }
 
     // Check if user already exists
@@ -44,24 +70,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password (simple hash for now - in production use bcrypt)
-    const password_hash = crypto.createHash('sha256').update(password).digest('hex')
+    // Hash password using bcrypt
+    const password_hash = await AuthService.hashPassword(password)
 
     // Create user
     const insertQuery = `
-      INSERT INTO users (name, email, password_hash, phone, role, is_active, created_at)
-      VALUES ($1, $2, $3, $4, 'customer', true, NOW())
-      RETURNING id, name, email, role, created_at
+      INSERT INTO users (name, email, password_hash, phone, role, is_active, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, 'customer', true, NOW(), NOW())
+      RETURNING id, name, email, role, is_active, created_at
     `
-    const values = [name, email, password_hash, phone || null]
+    const values = [name.trim(), email.toLowerCase().trim(), password_hash, phone?.trim() || null]
 
     const result = await query(insertQuery, values)
     const user = result.rows[0]
 
-    // TODO: Generate JWT tokens (Sprint 4 implementation)
-    // For now, return user without tokens
+    // Generate JWT tokens for immediate login
+    const tokenPayload = {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name
+    }
 
-    return NextResponse.json({
+    const tokens: TokenPair = AuthService.generateTokenPair(tokenPayload)
+
+    // Set secure HTTP-only cookies for tokens
+    const response = NextResponse.json({
       success: true,
       data: {
         user: {
@@ -69,11 +103,32 @@ export async function POST(request: NextRequest) {
           name: user.name,
           email: user.email,
           role: user.role,
+          is_active: user.is_active,
           created_at: user.created_at
         },
         message: 'User registered successfully'
       }
     }, { status: 201 })
+
+    // Set access token cookie (15 minutes)
+    response.cookies.set('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60, // 15 minutes
+      path: '/'
+    })
+
+    // Set refresh token cookie (7 days)
+    response.cookies.set('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: '/'
+    })
+
+    return response
 
   } catch (error) {
     console.error('Registration error:', error)

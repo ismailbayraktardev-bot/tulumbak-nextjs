@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/postgres'
-import crypto from 'crypto'
+import { AuthService, TokenPair } from '@/lib/auth'
 
 // POST /api/auth/login - User login
 export async function POST(request: NextRequest) {
@@ -16,16 +16,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password to match database
-    const password_hash = crypto.createHash('sha256').update(password).digest('hex')
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Invalid email format' } },
+        { status: 400 }
+      )
+    }
 
-    // Find user by email and password
+    // Find user by email
     const userQuery = `
-      SELECT id, name, email, role, is_active, created_at
+      SELECT id, name, email, password_hash, role, is_active, created_at, updated_at
       FROM users
-      WHERE email = $1 AND password_hash = $2
+      WHERE email = $1
     `
-    const result = await query(userQuery, [email, password_hash])
+    const result = await query(userQuery, [email])
 
     if (result.rows.length === 0) {
       return NextResponse.json(
@@ -44,12 +50,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TODO: Generate JWT tokens (Sprint 4 implementation)
-    // For now, return user without tokens
-    // const accessToken = jwt.sign(...)
-    // const refreshToken = jwt.sign(...)
+    // Verify password
+    const isValidPassword = await AuthService.verifyPassword(password, user.password_hash)
+    if (!isValidPassword) {
+      return NextResponse.json(
+        { success: false, error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password' } },
+        { status: 401 }
+      )
+    }
 
-    return NextResponse.json({
+    // Generate JWT tokens
+    const tokenPayload = {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name
+    }
+
+    const tokens: TokenPair = AuthService.generateTokenPair(tokenPayload)
+
+    // Set secure HTTP-only cookies for tokens
+    const response = NextResponse.json({
       success: true,
       data: {
         user: {
@@ -59,12 +80,29 @@ export async function POST(request: NextRequest) {
           role: user.role,
           created_at: user.created_at
         },
-        // TODO: Add tokens when JWT is implemented
-        // access_token: accessToken,
-        // refresh_token: refreshToken,
         message: 'Login successful'
       }
     })
+
+    // Set access token cookie (15 minutes)
+    response.cookies.set('access_token', tokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60, // 15 minutes
+      path: '/'
+    })
+
+    // Set refresh token cookie (7 days)
+    response.cookies.set('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: '/'
+    })
+
+    return response
 
   } catch (error) {
     console.error('Login error:', error)
