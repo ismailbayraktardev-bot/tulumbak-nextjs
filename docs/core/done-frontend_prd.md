@@ -192,4 +192,46 @@ packages/
 
 ---
 
-Bu PRD, Tulumbak projesinin frontend tarafında kullanıcı deneyimi, performans ve entegrasyon hedeflerini tanımlar. Geliştirmeler, backend PRD’deki API sözleşmeleriyle tam uyumlu olacak şekilde yürütülmelidir.
+## 13. Sprint History
+
+### 13.1. FE-02 Sprint Outcome (October 2025)
+
+**Sprint Goal:** Live API integration, admin data tables, and checkout foundation.
+
+**Summary of Work**
+
+✅ TypeScript & DX fixes (Phase 0)
+
+✅ Storefront polish + responsive (Track-S)
+
+✅ Live API integration for PLP & PDP
+
+✅ Admin dashboard TanStack Table integration (Track-A)
+
+✅ RHF + Zod form provider (Track-C foundation)
+
+**Key Deliverables**
+
+| Area | Deliverable |
+|------|-------------|
+| Storefront | Next Image migration, responsive grids, hover/transition polish, live PLP/PDP data |
+| Admin Dashboard | Products & Categories tables with pagination, sort, filters, row selection |
+| Checkout | RHF + Zod setup, Turkish validation messages |
+| DX | Clean TypeScript build, zero lint errors |
+
+**Kabul Kriterleri**
+
+- [x] Storefront renders with live API (/products, /categories)
+- [x] Admin tables functional with TanStack integration
+- [x] Checkout forms validated with RHF + Zod
+- [x] TypeScript build succeeds, no lint errors
+
+**Next Step → FE-03**
+
+- Cart + Checkout full integration (PayTR)
+- Admin CRUD drawer mutations
+- Performance polish (LCP, bundle size)
+
+---
+
+Bu PRD, Tulumbak projesinin frontend tarafında kullanıcı deneyimi, performans ve entegrasyon hedeflerini tanımlar. Geliştirmeler, backend PRD'deki API sözleşmeleriyle tam uyumlu olacak şekilde yürütülmelidir.
