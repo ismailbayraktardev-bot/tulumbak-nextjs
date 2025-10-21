@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone:*)",
+      "Bash(git pull:*)",
+      "Bash(tree:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(pnpm install)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(make:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(curl:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(PORT=3000 pnpm dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "outputStyle": "default"
+}
