@@ -52,7 +52,7 @@ export function RecentlyViewed({ products, className = '' }: RecentlyViewedProps
             className="w-10 h-10 rounded-full border border-product-accent/30 flex items-center justify-center text-product-subtext-light hover:bg-product-accent/10 transition-colors"
             aria-label="Önceki ürünler"
           >
-            <span className="material-symbols-outlined text-xl unfilled">
+            <span className="material-symbols-outlined text-xl">
               arrow_back
             </span>
           </button>
@@ -61,7 +61,7 @@ export function RecentlyViewed({ products, className = '' }: RecentlyViewedProps
             className="w-10 h-10 rounded-full border border-product-accent/30 flex items-center justify-center text-product-subtext-light hover:bg-product-accent/10 transition-colors"
             aria-label="Sonraki ürünler"
           >
-            <span className="material-symbols-outlined text-xl unfilled">
+            <span className="material-symbols-outlined text-xl">
               arrow_forward
             </span>
           </button>

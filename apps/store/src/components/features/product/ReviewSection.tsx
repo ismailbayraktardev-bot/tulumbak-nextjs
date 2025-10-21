@@ -118,12 +118,12 @@ export function ReviewSection({ reviews, onReviewSubmit, className = '' }: Revie
                   onMouseLeave={() => setHoveredRating(0)}
                   className="transition-transform hover:scale-110"
                 >
-                  <span 
+                  <span
                     className={`material-symbols-outlined text-2xl ${
-                      value <= (hoveredRating || rating) ? '' : 'unfilled'
+                      value <= (hoveredRating || rating) ? '' : 'text-gray-300'
                     }`}
                   >
-                    star
+                    {value <= (hoveredRating || rating) ? 'star' : 'star_border'}
                   </span>
                 </button>
               ))}

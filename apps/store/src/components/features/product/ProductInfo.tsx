@@ -105,7 +105,7 @@ export function ProductInfo({ product, onAddToCart, className = '' }: ProductInf
         </div>
 
         {/* Weight Selector */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <label className="text-sm font-medium text-product-text-light" htmlFor="weight">
             Kaç Kilogram Almak İstersiniz?
           </label>
@@ -113,7 +113,7 @@ export function ProductInfo({ product, onAddToCart, className = '' }: ProductInf
             id="weight"
             value={selectedWeight}
             onChange={(e) => handleWeightChange(e.target.value)}
-            className="w-full rounded-lg border-product-accent/30 bg-product-background-light focus:border-product-warm-button focus:ring-product-warm-button text-sm text-product-text-light"
+            className="w-full h-12 px-4 rounded-lg border border-product-accent/30 bg-product-background-light focus:border-product-warm-button focus:ring-product-warm-button text-sm text-product-text-light"
           >
             {product.weightOptions.map((option) => (
               <option key={option.id} value={option.id}>
