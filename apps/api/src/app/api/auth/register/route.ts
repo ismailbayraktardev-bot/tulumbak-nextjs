@@ -6,20 +6,38 @@ import { AuthService, TokenPair } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, password, phone } = body
+    const { first_name, last_name, email, password, phone } = body
 
     // Basic validation
-    if (!name || !email || !password) {
+    if (!first_name || !last_name || !email || !password) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Name, email and password are required' } },
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'First name, last name, email and password are required' } },
         { status: 400 }
       )
     }
 
     // Name validation
-    if (name.trim().length < 2 || name.trim().length > 120) {
+    const firstName = first_name.trim()
+    const lastName = last_name.trim()
+    const fullName = `${firstName} ${lastName}`
+
+    if (firstName.length < 2 || firstName.length > 50) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Name must be between 2 and 120 characters' } },
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'First name must be between 2 and 50 characters' } },
+        { status: 400 }
+      )
+    }
+
+    if (lastName.length < 2 || lastName.length > 50) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Last name must be between 2 and 50 characters' } },
+        { status: 400 }
+      )
+    }
+
+    if (fullName.length > 120) {
+      return NextResponse.json(
+        { success: false, error: { code: 'VALIDATION_ERROR', message: 'Full name must be less than 120 characters' } },
         { status: 400 }
       )
     }
@@ -75,11 +93,11 @@ export async function POST(request: NextRequest) {
 
     // Create user
     const insertQuery = `
-      INSERT INTO users (name, email, password_hash, phone, role, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, 'customer', true, NOW(), NOW())
-      RETURNING id, name, email, role, is_active, created_at
+      INSERT INTO users (name, first_name, last_name, email, password_hash, phone, role, is_active, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, 'customer', true, NOW(), NOW())
+      RETURNING id, name, first_name, last_name, email, role, is_active, created_at
     `
-    const values = [name.trim(), email.toLowerCase().trim(), password_hash, phone?.trim() || null]
+    const values = [fullName, firstName, lastName, email.toLowerCase().trim(), password_hash, phone?.trim() || null]
 
     const result = await query(insertQuery, values)
     const user = result.rows[0]
@@ -101,10 +119,13 @@ export async function POST(request: NextRequest) {
         user: {
           id: user.id,
           name: user.name,
+          first_name: user.first_name,
+          last_name: user.last_name,
           email: user.email,
           role: user.role,
           is_active: user.is_active,
-          created_at: user.created_at
+          created_at: user.created_at,
+          updated_at: user.updated_at
         },
         message: 'User registered successfully'
       }

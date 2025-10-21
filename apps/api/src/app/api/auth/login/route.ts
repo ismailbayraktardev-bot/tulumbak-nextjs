@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     // Find user by email
     const userQuery = `
-      SELECT id, name, email, password_hash, role, is_active, created_at, updated_at
+      SELECT id, name, first_name, last_name, email, password_hash, role, is_active, created_at, updated_at
       FROM users
       WHERE email = $1
     `
@@ -76,9 +76,13 @@ export async function POST(request: NextRequest) {
         user: {
           id: user.id,
           name: user.name,
+          first_name: user.first_name,
+          last_name: user.last_name,
           email: user.email,
           role: user.role,
-          created_at: user.created_at
+          is_active: user.is_active,
+          created_at: user.created_at,
+          updated_at: user.updated_at
         },
         message: 'Login successful'
       }

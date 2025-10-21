@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withOptionalAuth } from '@/lib/middleware'
+import { query } from '@/lib/postgres'
 
 // GET /api/auth/me - Get current authenticated user
 export async function GET(request: NextRequest) {
@@ -15,16 +16,29 @@ export async function GET(request: NextRequest) {
         }, { status: 401 })
       }
 
+      // Get full user data from database
+      const userQuery = `
+        SELECT id, name, first_name, last_name, email, phone, role, is_active, created_at, updated_at
+        FROM users
+        WHERE id = $1
+      `
+      const result = await query(userQuery, [user.userId])
+
+      if (result.rows.length === 0) {
+        return NextResponse.json({
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'User not found'
+          }
+        }, { status: 404 })
+      }
+
+      const userData = result.rows[0]
+
       return NextResponse.json({
         success: true,
-        data: {
-          user: {
-            id: user.userId,
-            name: user.name,
-            email: user.email,
-            role: user.role
-          }
-        }
+        data: userData
       })
 
     } catch (error) {

@@ -32,14 +32,11 @@ export async function POST(
 
     // Get product details
     const productQuery = `
-      SELECT p.*,
-             CASE WHEN $2 IS NOT NULL THEN pv.price ELSE p.price END as price,
-             CASE WHEN $2 IS NOT NULL THEN pv.stock_qty ELSE p.stock_qty END as stock_qty
+      SELECT p.*
       FROM products p
-      LEFT JOIN product_variants pv ON pv.id = $2 AND pv.product_id = p.id
       WHERE p.id = $1 AND p.is_active = true
     `
-    const productResult = await query(productQuery, [product_id, variant_id || null])
+    const productResult = await query(productQuery, [product_id])
 
     if (productResult.rows.length === 0) {
       return NextResponse.json(
