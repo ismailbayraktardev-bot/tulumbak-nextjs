@@ -1,112 +1,44 @@
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { Navbar } from '@/components/storefront/navbar'
 import { ProductGrid } from '@/components/storefront/product-grid'
 import { Footer } from '@/components/storefront/footer'
 import { Breadcrumbs } from '@/components/storefront/breadcrumbs'
-import { FilterBar } from '@/components/storefront/filter-bar'
 import { EmptyState } from '@/components/storefront/empty-state'
+import { ProductGridSkeleton } from '@/components/storefront/skeletons'
 import { apiGet } from '@/lib/api'
-import { Category } from '@/lib/types'
-// Mock products data
-const products = [
-  {
-    "id": "p1",
-    "name": "Tulumba Tatlısı",
-    "slug": "tulumba-tatlisi",
-    "image": {
-      "url": "/media/products/tulumba-tatlisi-1.jpg",
-      "alt": "Tulumba tatlısı"
-    },
-    "price_from": 120,
-    "price_to": 120,
-    "is_variable": false
-  },
-  {
-    "id": "p2",
-    "name": "Soğuk Baklava (Fıstıklı)",
-    "slug": "soguk-baklava-fistikli",
-    "image": {
-      "url": "/media/products/soguk-baklava-fistikli-1.jpg",
-      "alt": "Soğuk baklava fıstıklı"
-    },
-    "price_from": 390,
-    "price_to": 390,
-    "is_variable": false
-  },
-  {
-    "id": "p3",
-    "name": "Künefe (Peynirli)",
-    "slug": "kunefe-peynirli",
-    "image": {
-      "url": "/media/products/kunefe-peynirli-1.jpg",
-      "alt": "Künefe peynirli"
-    },
-    "price_from": 280,
-    "price_to": 280,
-    "is_variable": false
-  },
-  {
-    "id": "p4",
-    "name": "Kazandibi",
-    "slug": "kazandibi",
-    "image": {
-      "url": "/media/products/kazandibi-1.jpg",
-      "alt": "Kazandibi"
-    },
-    "price_from": 180,
-    "price_to": 180,
-    "is_variable": false
-  },
-  {
-    "id": "p5",
-    "name": "Sütlaç",
-    "slug": "sutlac",
-    "image": {
-      "url": "/media/products/sutlac-1.jpg",
-      "alt": "Sütlaç"
-    },
-    "price_from": 150,
-    "price_to": 150,
-    "is_variable": false
-  },
-  {
-    "id": "p6",
-    "name": "Revani",
-    "slug": "revani",
-    "image": {
-      "url": "/media/products/revani-1.jpg",
-      "alt": "Revani"
-    },
-    "price_from": 200,
-    "price_to": 200,
-    "is_variable": false
-  }
-]
+import { Category, ProductSummary, PaginatedResponse } from '@/lib/types'
+import { getMockCategoryBySlug, getMockProductsByCategory } from '@/lib/mock-data'
+// Client component for filters
+import { CategoryFilterClient } from '@/components/storefront/category-filter-client'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
-  searchParams: {
+  }>
+  searchParams: Promise<{
     weight?: string
     min_price?: string
     max_price?: string
     sort?: string
     page?: string
-  }
+  }>
 }
 
-export default async function CategoryPage({ params, searchParams }: PageProps) {
-  const { slug } = params
-  const { weight, min_price, max_price, sort, page } = searchParams
+async function CategoryPageContent({ params, searchParams }: PageProps) {
+  // Next.js 15: Await params and searchParams
+  const { slug } = await params
+  const { weight, min_price, max_price, sort, page } = await searchParams
 
-  // Kategori bilgisini çek
+  // Kategori bilgisini çek (mock data fallback ile)
   let category: Category | null = null
   try {
     const response = await apiGet<{ success: boolean; data: Category[] }>('/categories')
     category = response.data?.find(cat => cat.slug === slug) || null
   } catch (error) {
     console.error('Kategori yüklenirken hata:', error)
+    // Mock data fallback
+    category = getMockCategoryBySlug(slug) || null
   }
 
   if (!category) {
@@ -134,33 +66,31 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
     )
   }
 
-  // Mock ürün verilerini filtrele (gerçek uygulamada API'den gelecek)
-  let filteredProducts = products
-
-  // Fiyat filtresi
-  if (min_price) {
-    const minPrice = parseFloat(min_price)
-    filteredProducts = filteredProducts.filter(p => p.price_from >= minPrice)
-  }
-  if (max_price) {
-    const maxPrice = parseFloat(max_price)
-    filteredProducts = filteredProducts.filter(p => p.price_from <= maxPrice)
-  }
-
-  // Ağırlık filtresi (mock)
-  if (weight) {
-    const weightValue = parseFloat(weight)
-    // Mock: sadece tulumba tatlısı için ağırlık filtresi
-    if (weightValue === 0.5) {
-      filteredProducts = filteredProducts.filter(p => p.slug === 'tulumba-tatlisi')
-    }
-  }
-
-  // Sıralama
-  if (sort === 'price_asc') {
-    filteredProducts.sort((a, b) => a.price_from - b.price_from)
-  } else if (sort === 'price_desc') {
-    filteredProducts.sort((a, b) => b.price_from - a.price_from)
+  // Ürün verilerini çek (mock data fallback ile)
+  let products: ProductSummary[] = []
+  
+  try {
+    const queryParams = new URLSearchParams({
+      category: slug,
+      page: page || '1',
+      per_page: '12',
+      sort: sort || 'price_asc'
+    })
+    
+    if (weight) queryParams.append('weight', weight)
+    if (min_price) queryParams.append('min_price', min_price)
+    if (max_price) queryParams.append('max_price', max_price)
+    
+    const response = await apiGet<PaginatedResponse<ProductSummary>>(
+      `/products?${queryParams.toString()}`,
+      60 // revalidate 60s
+    )
+    
+    products = response.data || []
+  } catch (error) {
+    console.error('Ürünler yüklenirken hata:', error)
+    // Mock data fallback
+    products = getMockProductsByCategory(slug)
   }
 
   // Breadcrumbs
@@ -183,41 +113,60 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
       <Navbar />
       
       <main>
-        <div className="bg-tulumbak-beige py-8">
+        {/* Mobile-first: Category Header */}
+        <div className="bg-tulumbak-beige py-4 sm:py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Breadcrumbs items={breadcrumbItems} />
-            
-            <div className="mt-8">
-              <h1 className="text-4xl font-serif font-bold text-tulumbak-slate mb-4">
+           
+            <div className="mt-4 sm:mt-8">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-tulumbak-slate mb-2 sm:mb-4">
                 {category.name}
               </h1>
-              <p className="text-lg text-gray-600">
-                {filteredProducts.length} ürün bulundu
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600">
+                {products.length} ürün bulundu
               </p>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Filters */}
+        {/* Mobile-first: Category Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            {/* Mobile-first: Filters */}
             <div className="lg:w-1/4">
-              <FilterBar
-                categories={[{ id: category.id, name: category.name, slug: category.slug }]}
-                selectedCategory={slug}
-                weight={filterState.weight}
-                priceRange={filterState.priceRange}
-                onChange={(newState) => {
-                  // URL güncelleme (client-side'da yapılacak)
-                  console.log('Filter changed:', newState)
-                }}
-              />
+              {/* Mobile filter pills - Sticky on mobile */}
+              <div className="lg:hidden sticky top-20 z-40 bg-white border-b pb-4 mb-4">
+                <div className="flex overflow-x-auto space-x-2 pb-2">
+                  <span className="px-3 py-1 bg-tulumbak-amber text-white text-sm rounded-full whitespace-nowrap">
+                    Tümü
+                  </span>
+                  {weight && (
+                    <span className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-full whitespace-nowrap">
+                      {weight}g
+                    </span>
+                  )}
+                  {(min_price || max_price) && (
+                    <span className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-full whitespace-nowrap">
+                      Fiyat
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              {/* Desktop filter sidebar */}
+              <div className="hidden lg:block">
+                <CategoryFilterClient
+                  category={{ id: category.id, name: category.name, slug: category.slug }}
+                  initialWeight={filterState.weight}
+                  initialPriceRange={filterState.priceRange}
+                />
+              </div>
             </div>
 
-            {/* Products */}
+            {/* Mobile-first: Products */}
             <div className="lg:w-3/4">
-              {filteredProducts.length > 0 ? (
-                <ProductGrid products={filteredProducts} />
+              {products.length > 0 ? (
+                <ProductGrid products={products} />
               ) : (
                 <EmptyState
                   title="Ürün Bulunamadı"
@@ -235,5 +184,13 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
       <Footer />
     </div>
+  )
+}
+
+export default function CategoryPage({ params, searchParams }: PageProps) {
+  return (
+    <Suspense fallback={<ProductGridSkeleton />}>
+      <CategoryPageContent params={params} searchParams={searchParams} />
+    </Suspense>
   )
 }

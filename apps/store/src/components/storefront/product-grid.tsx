@@ -13,12 +13,13 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid gap-8 ${gridCols[columns.sm as keyof typeof gridCols]} md:${gridCols[columns.md as keyof typeof gridCols]} lg:${gridCols[columns.lg as keyof typeof gridCols]}`}>
+    <div className={`grid gap-4 md:gap-6 lg:gap-8 ${gridCols[columns.sm as keyof typeof gridCols]} md:${gridCols[columns.md as keyof typeof gridCols]} lg:${gridCols[columns.lg as keyof typeof gridCols]} touch-action-manipulation`}>
       {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-        />
+        <div key={product.id} className="group cursor-pointer tap-highlight-transparent min-h-[44px]">
+          <ProductCard
+            product={product}
+          />
+        </div>
       ))}
     </div>
   )

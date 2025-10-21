@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Button } from 'tulumbak-ui'
 import { HeroProps } from 'tulumbak-shared'
 
@@ -35,10 +36,13 @@ export function Hero({ title, subtitle, cta, image }: HeroProps) {
           {/* Image */}
           <div className="relative">
             <div className="aspect-hero rounded-2xl overflow-hidden shadow-card">
-              <img
+              <Image
                 src={image.src}
                 alt={image.alt}
-                className="w-full h-full object-cover"
+                fill
+                sizes="100vw"
+                priority={true}
+                className="object-cover"
               />
             </div>
             {/* Decorative elements */}

@@ -5,7 +5,7 @@ import { Button } from 'tulumbak-ui'
 import { FilterBarProps, FilterState } from 'tulumbak-shared'
 
 export function FilterBar({ 
-  categories, 
+  // categories, // Will be used for category filtering
   selectedCategory, 
   weight, 
   priceRange, 

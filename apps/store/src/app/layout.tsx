@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Merriweather, Lato, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/auth/auth-provider";
 
 const merriweather = Merriweather({
   variable: "--font-merriweather",
@@ -34,7 +35,9 @@ export default function RootLayout({
       <body
         className={`${merriweather.variable} ${lato.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,67 +1,48 @@
-import { Skeleton } from 'tulumbak-ui'
+// import { Skeleton } from 'tulumbak-ui' // Will be used for more complex skeletons
 
 export function ProductCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-card overflow-hidden">
-      <Skeleton className="aspect-product w-full" />
-      <div className="p-6 space-y-3">
-        <Skeleton className="h-6 w-3/4" />
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-5 w-20" />
-          <Skeleton className="h-4 w-16" />
-        </div>
-        <Skeleton className="h-10 w-full" />
+    <div className="animate-pulse">
+      <div className="aspect-[3/2] bg-gray-200 rounded-12" />
+      <div className="p-4 space-y-2">
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
       </div>
+    </div>
+  )
+}
+
+export function ProductGridSkeleton({ count = 6 }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <ProductCardSkeleton key={i} />
+      ))}
     </div>
   )
 }
 
 export function PDPImageSkeleton() {
   return (
-    <div className="space-y-4">
-      <Skeleton className="aspect-square w-full rounded-2xl" />
-      <div className="grid grid-cols-4 gap-2">
-        <Skeleton className="aspect-square rounded-lg" />
-        <Skeleton className="aspect-square rounded-lg" />
-        <Skeleton className="aspect-square rounded-lg" />
-        <Skeleton className="aspect-square rounded-lg" />
+    <div className="animate-pulse">
+      <div className="aspect-square bg-gray-200 rounded-2xl" />
+      <div className="grid grid-cols-4 gap-2 mt-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="aspect-square bg-gray-200 rounded-lg" />
+        ))}
       </div>
     </div>
   )
 }
 
-export function CategoryTileSkeleton() {
+export function CategoryTilesSkeleton() {
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-white shadow-card">
-      <Skeleton className="aspect-category w-full" />
-      <div className="absolute bottom-0 left-0 right-0 p-6">
-        <Skeleton className="h-6 w-32 mb-2" />
-        <Skeleton className="h-4 w-16" />
-      </div>
-    </div>
-  )
-}
-
-export function FilterBarSkeleton() {
-  return (
-    <div className="bg-white rounded-lg shadow-card p-6 space-y-6">
-      <Skeleton className="h-6 w-20" />
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-16" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-12" />
-          <Skeleton className="h-4 w-12" />
-          <Skeleton className="h-4 w-12" />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="animate-pulse">
+          <div className="aspect-category bg-gray-200 rounded-2xl" />
         </div>
-      </div>
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-20" />
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-        </div>
-      </div>
-      <Skeleton className="h-8 w-full" />
+      ))}
     </div>
   )
 }

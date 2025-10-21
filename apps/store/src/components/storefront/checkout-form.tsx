@@ -1,218 +1,107 @@
 'use client'
-
-import { useState } from 'react'
-import { Button, Input, Card, CardContent, CardHeader, CardTitle } from 'tulumbak-ui'
+import { useCheckoutForm } from '@/lib/form/checkout-form-provider'
+import { Input } from 'tulumbak-ui'
 
 export function CheckoutForm() {
-  const [currentStep, setCurrentStep] = useState(0)
-
-  const steps = [
-    {
-      title: 'İletişim Bilgileri',
-      content: (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ad *
-              </label>
-              <Input placeholder="Adınız" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Soyad *
-              </label>
-              <Input placeholder="Soyadınız" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              E-posta *
-            </label>
-            <Input type="email" placeholder="ornek@email.com" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Telefon *
-            </label>
-            <Input placeholder="+90 (5XX) XXX XX XX" />
-          </div>
-        </div>
-      )
-    },
-    {
-      title: 'Teslimat Adresi',
-      content: (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Adres Başlığı *
-            </label>
-            <Input placeholder="Ev, İş, vb." />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Adres *
-            </label>
-            <textarea 
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              rows={3}
-              placeholder="Mahalle, sokak, bina no, daire no..."
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                İl *
-              </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-                <option>İstanbul</option>
-                <option>Ankara</option>
-                <option>İzmir</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                İlçe *
-              </label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-                <option>Kadıköy</option>
-                <option>Beşiktaş</option>
-                <option>Şişli</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Posta Kodu
-              </label>
-              <Input placeholder="34000" />
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: 'Teslimat Zamanı',
-      content: (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Teslimat Tarihi *
-            </label>
-            <Input type="date" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Teslimat Saati *
-            </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
-              <option>09:00 - 12:00</option>
-              <option>12:00 - 15:00</option>
-              <option>15:00 - 18:00</option>
-              <option>18:00 - 21:00</option>
-            </select>
-          </div>
-          <div className="bg-tulumbak-beige p-4 rounded-lg">
-            <h4 className="font-medium text-tulumbak-slate mb-2">Teslimat Notu</h4>
-            <p className="text-sm text-gray-600">
-              Ürünlerimiz soğuk zincir korunarak teslim edilir. 
-              Belirtilen saatte evde olmanızı rica ederiz.
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: 'Fatura Bilgileri',
-      content: (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <input type="checkbox" id="same-address" className="rounded" />
-            <label htmlFor="same-address" className="text-sm text-gray-700">
-              Fatura adresi teslimat adresi ile aynı
-            </label>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Firma Adı
-              </label>
-              <Input placeholder="Firma adı (isteğe bağlı)" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Vergi No
-              </label>
-              <Input placeholder="Vergi numarası (isteğe bağlı)" />
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: 'Ödeme',
-      content: (
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <label className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg cursor-pointer hover:border-tulumbak-amber">
-              <input type="radio" name="payment" value="card" className="text-tulumbak-amber" />
-              <div>
-                <div className="font-medium">Kredi/Banka Kartı</div>
-                <div className="text-sm text-gray-500">Visa, Mastercard, American Express</div>
-              </div>
-            </label>
-            <label className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg cursor-pointer hover:border-tulumbak-amber">
-              <input type="radio" name="payment" value="cash" className="text-tulumbak-amber" />
-              <div>
-                <div className="font-medium">Kapıda Ödeme</div>
-                <div className="text-sm text-gray-500">Nakit veya kart ile teslimatta ödeme</div>
-              </div>
-            </label>
-          </div>
-          <div className="bg-tulumbak-beige p-4 rounded-lg">
-            <h4 className="font-medium text-tulumbak-slate mb-2">Güvenli Ödeme</h4>
-            <p className="text-sm text-gray-600">
-              Tüm ödemeleriniz SSL sertifikası ile korunmaktadır. 
-              Kart bilgileriniz saklanmaz.
-            </p>
-          </div>
-        </div>
-      )
-    }
-  ]
+  const { register, formState: { errors } } = useCheckoutForm()
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{steps[currentStep].title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {steps[currentStep].content}
-        
-        <div className="flex justify-between mt-8">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
-            disabled={currentStep === 0}
-          >
-            Geri
-          </Button>
-          
-          <Button
-            className="bg-tulumbak-amber hover:bg-tulumbak-amber/90"
-            onClick={() => {
-              if (currentStep < steps.length - 1) {
-                setCurrentStep(currentStep + 1)
-              } else {
-                // Siparişi tamamla
-                alert('Sipariş tamamlandı! (Demo)')
-              }
-            }}
-          >
-            {currentStep === steps.length - 1 ? 'Siparişi Tamamla' : 'İleri'}
-          </Button>
+    <div className="bg-white rounded-lg shadow-card p-6">
+      <div className="space-y-6">
+        {/* Contact Information */}
+        <div className="border-b border-gray-200 pb-6">
+          <h3 className="text-lg font-semibold text-tulumbak-slate mb-4">
+            İletişim Bilgileri
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Input
+                {...register('contact.email')}
+                placeholder="Email"
+                type="email"
+              />
+              {errors.contact?.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.contact.email.message}</p>
+              )}
+            </div>
+            
+            <div>
+              <Input
+                {...register('contact.phone')}
+                placeholder="Telefon"
+              />
+              {errors.contact?.phone && (
+                <p className="text-sm text-red-600 mt-1">{errors.contact.phone.message}</p>
+              )}
+            </div>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Address Information */}
+        <div className="border-b border-gray-200 pb-6">
+          <h3 className="text-lg font-semibold text-tulumbak-slate mb-4">
+            Teslimat Adresi
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <Input
+                {...register('address.street')}
+                placeholder="Adres"
+              />
+              {errors.address?.street && (
+                <p className="text-sm text-red-600 mt-1">{errors.address.street.message}</p>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Input
+                  {...register('address.city')}
+                  placeholder="Şehir"
+                />
+                {errors.address?.city && (
+                  <p className="text-sm text-red-600 mt-1">{errors.address.city.message}</p>
+                )}
+              </div>
+              
+              <div>
+                <Input
+                  {...register('address.postalCode')}
+                  placeholder="Posta Kodu"
+                />
+                {errors.address?.postalCode && (
+                  <p className="text-sm text-red-600 mt-1">{errors.address.postalCode.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Billing Information */}
+        <div>
+          <h3 className="text-lg font-semibold text-tulumbak-slate mb-4">
+            Fatura Bilgileri
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <Input
+                {...register('billing.name')}
+                placeholder="Fatura Adı"
+              />
+              {errors.billing?.name && (
+                <p className="text-sm text-red-600 mt-1">{errors.billing.name.message}</p>
+              )}
+            </div>
+            
+            <div>
+              <Input
+                {...register('billing.taxId')}
+                placeholder="Vergi Numarası (Opsiyonel)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

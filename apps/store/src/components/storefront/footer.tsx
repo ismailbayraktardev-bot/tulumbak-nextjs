@@ -11,7 +11,7 @@ export function Footer() {
               Tulumbak
             </h3>
             <p className="text-gray-300 mb-6 max-w-md">
-              Türkiye'nin en lezzetli tatlılarını evinize getiriyoruz. 
+              Türkiye&apos;nin en lezzetli tatlılarını evinize getiriyoruz. 
               Taze hazırlanmış, geleneksel tariflerle yapılmış tatlılarımızla 
               damak zevkinizi tatmin edin.
             </p>
