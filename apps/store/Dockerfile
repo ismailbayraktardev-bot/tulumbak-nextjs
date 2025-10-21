@@ -12,9 +12,9 @@ RUN npm install -g pnpm
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
-COPY packages/shared/package.json ./packages/shared/
-COPY packages/config/package.json ./packages/config/
-COPY packages/ui/package.json ./packages/ui/
+COPY ../../packages/shared/package.json ./packages/shared/
+COPY ../../packages/config/package.json ./packages/config/
+COPY ../../packages/ui/package.json ./packages/ui/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile

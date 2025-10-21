@@ -20,7 +20,13 @@
       "Bash(PORT=3000 pnpm dev:*)",
       "Bash(npm install:*)",
       "Bash(node:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(PORT=3001 pnpm dev:*)",
+      "Bash(PORT=3002 pnpm dev:*)",
+      "Bash(PORT=3003 pnpm dev:*)",
+      "Bash(PORT=3005 pnpm dev:*)",
+      "Bash(PORT=3006 pnpm dev:*)",
+      "Bash(PORT=3007 pnpm dev:*)"
     ],
     "deny": [],
     "ask": []

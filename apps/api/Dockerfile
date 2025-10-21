@@ -1,10 +1,9 @@
-# Multi-stage build for Next.js API application
-# Stage 1: Build stage
-FROM node:20-alpine AS base
+# Development Dockerfile for Next.js API application
+FROM node:20-alpine
 
-# Install dependencies only when needed
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
+# Install dependencies
+RUN apk add --no-cache libc6-compat curl
+
 WORKDIR /app
 
 # Install pnpm
@@ -12,52 +11,28 @@ RUN npm install -g pnpm
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
-COPY packages/shared/package.json ./packages/shared/
-COPY packages/config/package.json ./packages/config/
-COPY packages/ui/package.json ./packages/ui/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# Install dependencies with build scripts
+RUN pnpm install --ignore-scripts=false
 
-# Stage 2: Build stage
-FROM base AS builder
-WORKDIR /app
-RUN npm install -g pnpm
+# Copy source code
+COPY . .
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages ./packages
-
-COPY package.json ./
-COPY tsconfig.json ./
-COPY .env* ./
-COPY src ./src
-
-# Build the application
-RUN pnpm build
-
-# Stage 3: Production stage
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV production
-
+# Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy built application
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
+# Switch to non-root user
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
+ENV NODE_ENV development
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
-CMD ["node", "server.js"]
+CMD ["pnpm", "dev"]
