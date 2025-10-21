@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Merriweather, Lato, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { HydrationWarningSuppressor } from "@/components/hydration-warning-suppressor";
 
 const merriweather = Merriweather({
   variable: "--font-merriweather",
@@ -34,7 +35,9 @@ export default function RootLayout({
     <html lang="tr">
       <body
         className={`${merriweather.variable} ${lato.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
+        <HydrationWarningSuppressor />
         <AuthProvider>
           {children}
         </AuthProvider>

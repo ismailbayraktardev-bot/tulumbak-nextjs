@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
             WHEN LOWER(z.city) = $1 AND LOWER(z.district) = $2 THEN 100
             WHEN LOWER(z.city) = $1 AND $3 IS NOT NULL AND $3 = ANY(z.postal_codes) THEN 95
             WHEN LOWER(z.city) = $1 THEN 80
+            WHEN $4 IS NOT NULL AND LOWER($4) = LOWER(z.neighborhood) THEN 70
             ELSE 0
           END as match_score
 
