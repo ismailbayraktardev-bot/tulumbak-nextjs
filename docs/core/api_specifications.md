@@ -1,24 +1,33 @@
 # Tulumbak — API Specifications (v1)
+**Updated 2025-10-21 - Sprint 4 Progress**
 
 > **Amaç:** Storefront ve Admin Dashboard için tek ve tutarlı bir REST API sözleşmesi.
-> **Stack:** Next.js (App Router) + Node/TypeScript. Auth: **Supabase Auth** (JWT, httpOnly cookie).
+> **Stack:** Next.js 15 (App Router) + PostgreSQL + TypeScript.
 > **Para birimi:** TL, varsayılan **KDV dahil** (ayar ile değiştirilebilir).
+>
+> **🎯 DURUM: SPRINT 4 DEVAM EDİYOR ✅**
+> - ✅ 17/50+ endpoints working (34%)
+> - ✅ Complete Product CRUD with filtering
+> - ✅ Full Cart System (7 endpoints)
+> - ✅ Authentication System (2 endpoints)
+> - ✅ Orders System (3 endpoints)
+> - ✅ Turkish e-commerce data ready
 
 ---
 
 ## 0) Konvansiyonlar
-- **Base URL:** `https://api.tulumbak.com/api/v1`
+- **Base URL:** `http://localhost:3001/api` (Development)
 - **İçerik türü:** `application/json; charset=utf-8`
 - **Authentication:**
-  - Storefront: Supabase session (httpOnly cookie) → public GET’ler auth’suz; sepete/checkout’a cookie gerekir.
-  - Admin: `Authorization: Bearer <token>` (Supabase service role veya RLS uygun JWT).
+  - Storefront: Session-based (geçici olarak, Sprint 4'te JWT implementasyonu)
+  - Admin: `Authorization: Bearer <token>` (Sprint 4'te implementasyon)
 - **Rate limit (varsayılan):** IP başına **1000/10dk**. Aşımda `429` + `Retry-After`.
 - **İdempotency:** Yazma istekleri için `Idempotency-Key: <uuid>` desteklenir.
 - **Sayfalama:** `page` (1..n), `per_page` (max 50). Yanıtta `meta: { page, per_page, total }`.
 - **Sıralama:** `sort=price_asc|price_desc|newest|bestseller`.
 - **Hata formatı:**
 ```json
-{ "error": { "code": "VALIDATION_ERROR", "message": "…", "fields": { "name": "Required" } } }
+{ "success": false, "error": { "code": "VALIDATION_ERROR", "message": "…", "fields": { "name": "Required" } } }
 ```
 
 ---
