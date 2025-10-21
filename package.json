@@ -1,0 +1,36 @@
+{
+  "name": "tulumbak",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tulumbak Next.js E-ticaret Platformu",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"tulumbak-*\" dev",
+    "build": "pnpm --parallel --filter \"tulumbak-*\" build",
+    "start": "pnpm --parallel --filter \"tulumbak-*\" start",
+    "lint": "pnpm --parallel --filter \"tulumbak-*\" lint",
+    "test": "pnpm --parallel --filter \"tulumbak-*\" test",
+    "clean": "pnpm --parallel --filter \"tulumbak-*\" clean",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:dev-down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build -d",
+    "docker:prod-down": "docker-compose -f docker-compose.prod.yml down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9",
+    "prettier": "^3.0.0",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
