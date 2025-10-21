@@ -37,21 +37,9 @@ export async function POST(request: NextRequest) {
 
     const { city, district, postal_code, neighborhood, address_line } = body
 
-    // Normalize inputs (Turkish character handling)
-    const normalizeText = (text: string) => {
-      return text
-        .trim()
-        .toLowerCase()
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ı/g, 'i')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c')
-    }
-
-    const normalizedCity = normalizeText(city)
-    const normalizedDistrict = normalizeText(district)
+      // Use original Turkish text - database has proper UTF-8 encoding
+    const cityLower = city.toLowerCase().trim()
+    const districtLower = district.toLowerCase().trim()
 
     // Query to find best branch/zone match
     const lookupQuery = `
@@ -106,8 +94,8 @@ export async function POST(request: NextRequest) {
     `
 
     const result = await pool.query(lookupQuery, [
-      normalizedCity,
-      normalizedDistrict,
+      cityLower,
+      districtLower,
       postal_code || null,
       neighborhood || null
     ])
@@ -142,7 +130,7 @@ export async function POST(request: NextRequest) {
         LIMIT 1
       `
 
-      const fallbackResult = await pool.query(fallbackQuery, [normalizedCity])
+      const fallbackResult = await pool.query(fallbackQuery, [cityLower])
 
       if (fallbackResult.rows.length === 0) {
         return NextResponse.json(
@@ -229,7 +217,7 @@ export async function POST(request: NextRequest) {
       LIMIT 3
     `
 
-    const alternativesResult = await pool.query(alternativesQuery, [normalizedCity, normalizedDistrict])
+    const alternativesResult = await pool.query(alternativesQuery, [cityLower, districtLower])
 
     const response = {
       success: true,
@@ -333,7 +321,7 @@ export async function GET(request: NextRequest) {
         ORDER BY district
       `
 
-      const result = await pool.query(districtsQuery, [city.trim()])
+      const result = await pool.query(districtsQuery, [city.trim().toLowerCase()])
 
       const response = {
         success: true,

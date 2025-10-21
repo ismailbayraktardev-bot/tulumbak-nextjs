@@ -301,6 +301,57 @@ export function getMockFeaturedProducts(limit = 6) {
     .slice(0, limit);
 }
 
+// Home page mock data
+export const mockHeroContent: HeroContent = {
+  title: "Otantik Türk Tatlılarının Tadını Çıkarın",
+  subtitle: "Sevgiyle hazırlanmış, kapınıza teslim edilir",
+  cta: {
+    label: "Koleksiyonumuzu Keşfedin",
+    href: "/kategori/tulumbalar"
+  },
+  backgroundImage: "https://images.unsplash.com/photo-1571872529578-1c6e4dfd2a9e?w=1600&h=800&fit=crop"
+};
+
+export const mockCustomerReviews: HomeReview[] = [
+  {
+    id: "1",
+    rating: 5,
+    content: "Kesinlikle harika! Baklava dışında Türkiye'de yediğim en iyisiydi. Taze ve otantik.",
+    reviewer: {
+      name: "Ayşe Y."
+    },
+    date: "2023-10-15"
+  },
+  {
+    id: "2",
+    rating: 5,
+    content: "Türk Lokumu bir rüyaydı. O kadar harika lezzetler ve doku mükemmeldi. Kesinlikle tavsiye ederim!",
+    reviewer: {
+      name: "Mehmet K."
+    },
+    date: "2023-10-10"
+  },
+  {
+    id: "3",
+    rating: 4.5,
+    content: "Hızlı teslimat ve inanılmaz tatlılar. Künefe sıcak, peynirli, tatlı bir lezzetti. Tekrar sipariş vereceğim!",
+    reviewer: {
+      name: "Zeynep A."
+    },
+    date: "2023-10-05"
+  }
+];
+
+export const mockOurStory: OurStory = {
+  title: "Bizim Hikayemiz",
+  content: "Türkiye'nin zengin mutfak mirasını koruma tutkusundan doğan Tulumbak, sadece bir tatlı dükkanından daha fazlasıdır. Vatanımızın otantik lezzetlerine ve zaman onurulan geleneklere bir köprüdür. En iyi malzemeleri ve nesiller boyunca aktarılan tarifleri kullanarak size gerçek Türk lezzetini sunuyoruz.",
+  videoUrl: "https://images.unsplash.com/photo-1571872529578-1c6e4dfd2a9e?w=800&h=600&fit=crop",
+  videoAlt: "Bir Türk büyükannesinin mutfakta geleneksel tatlılar hazırladığı"
+};
+
+// Recently viewed products for home page (first 4 products)
+export const mockRecentlyViewedHome = mockProducts.slice(0, 4);
+
 export function getMockCategoryBySlug(slug: string) {
   return mockCategories.find(category => category.slug === slug);
 }

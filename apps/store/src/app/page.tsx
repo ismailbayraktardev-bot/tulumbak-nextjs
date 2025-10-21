@@ -1,104 +1,60 @@
-import { Suspense } from 'react'
-import Link from 'next/link'
-import { Navbar } from '@/components/storefront/navbar'
-import { Hero } from '@/components/storefront/hero'
-import { CategoryTiles } from '@/components/storefront/category-tiles'
-import { ProductGrid } from '@/components/storefront/product-grid'
-import { Footer } from '@/components/storefront/footer'
-import { CategoryTilesSkeleton, ProductGridSkeleton } from '@/components/storefront/skeletons'
-import { Button } from 'tulumbak-ui'
-import { apiGet } from '@/lib/api'
-import { Category, ProductSummary } from '@/lib/types'
-import { mockCategories, mockProducts, getMockFeaturedProducts } from '@/lib/mock-data'
+import { HomeHeader } from '@/components/features/home/HomeHeader';
+import { HeroSection } from '@/components/features/home/HeroSection';
+import { FeaturedDesserts } from '@/components/features/home/FeaturedDesserts';
+import { RecentlyViewed } from '@/components/features/home/RecentlyViewed';
+import { CustomerReviews } from '@/components/features/home/CustomerReviews';
+import { OurStory } from '@/components/features/home/OurStory';
+import { HomeFooter } from '@/components/features/home/HomeFooter';
+import { 
+  mockHeroContent, 
+  mockCustomerReviews, 
+  mockOurStory, 
+  mockRecentlyViewedHome,
+  getMockFeaturedProducts 
+} from '@/lib/mock-data';
 
-export default async function Home() {
-  // API'den kategori verilerini çek (mock data fallback ile)
-  let categories: Category[] = []
-  try {
-    const response = await apiGet<{ success: boolean; data: Category[] }>('/categories')
-    categories = response.data || []
-  } catch (error) {
-    console.error('Kategoriler yüklenirken hata:', error)
-    // Mock data fallback
-    categories = mockCategories
-  }
-
-  // Öne çıkan ürünleri çek (mock data fallback ile)
-  let featuredProducts: ProductSummary[] = []
-  try {
-    const response = await apiGet<{ success: boolean; data: ProductSummary[] }>('/products?featured=true')
-    featuredProducts = response.data || []
-  } catch (error) {
-    console.error('Öne çıkan ürünler yüklenirken hata:', error)
-    // Mock data fallback
-    featuredProducts = getMockFeaturedProducts(6)
-  }
-
-  // Kategori tiles için veri hazırla
-  const categoryTiles = categories.map(category => ({
-    title: category.name,
-    href: `/kategori/${category.slug}`,
-    image: {
-      src: `/media/categories/${category.slug}.jpg`,
-      alt: category.name
-    }
-  }))
+export default function Home() {
+  // Get featured products
+  const featuredProducts = getMockFeaturedProducts(6);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      
+    <div className="min-h-screen bg-stitch-background-light font-display text-stitch-text-primary">
+      {/* Header */}
+      <HomeHeader />
+
+      {/* Main Content */}
       <main>
-        <Hero
-          title="Türkiye'nin En Lezzetli Tatlıları"
-          subtitle="Taze hazırlanmış, geleneksel tariflerle yapılmış tatlılarımızla damak zevkinizi tatmin edin."
-          cta={{
-            label: "Hemen Sipariş Ver",
-            href: "/kategori/tulumbalar"
-          }}
-          image={{
-            src: "/media/hero/tulumbak-hero.jpg",
-            alt: "Tulumbak tatlıları"
-          }}
+        {/* Hero Section */}
+        <div className="py-10">
+          <div className="@[480px]:p-4">
+            <HeroSection content={mockHeroContent} />
+          </div>
+        </div>
+
+        {/* Featured Desserts */}
+        <FeaturedDesserts 
+          products={featuredProducts}
+          title="Öne Çıkan Tatlılar"
         />
 
-        <Suspense fallback={<CategoryTilesSkeleton />}>
-          <CategoryTiles items={categoryTiles} />
-        </Suspense>
+        {/* Recently Viewed */}
+        <RecentlyViewed 
+          products={mockRecentlyViewedHome}
+          title="Son Görüntülenenler"
+        />
 
-        <section className="py-8 sm:py-16 bg-tulumbak-beige">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Mobile-first: Section Header */}
-            <div className="text-center mb-6 sm:mb-12">
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-tulumbak-slate mb-2 sm:mb-4">
-                Öne Çıkan Ürünler
-              </h2>
-              <p className="text-base sm:text-lg text-gray-600">
-                En çok tercih edilen tatlılarımız
-              </p>
-            </div>
+        {/* Customer Reviews */}
+        <CustomerReviews 
+          reviews={mockCustomerReviews}
+          title="Müşteriler Ne Diyor"
+        />
 
-            {/* Mobile-first: Product Grid */}
-            <Suspense fallback={<ProductGridSkeleton />}>
-              <ProductGrid products={featuredProducts} />
-            </Suspense>
-            
-            {/* Mobile-first: View All Button */}
-            <div className="text-center mt-8 sm:mt-12">
-              <Link href="/kategori/tulumbalar">
-                <Button
-                  size="lg"
-                  className="bg-tulumbak-amber hover:bg-tulumbak-amber/90 text-white h-12 sm:h-14 px-6 sm:px-8"
-                >
-                  Tüm Ürünleri Gör
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* Our Story */}
+        <OurStory content={mockOurStory} />
       </main>
 
-      <Footer />
+      {/* Footer */}
+      <HomeFooter />
     </div>
-  )
+  );
 }
