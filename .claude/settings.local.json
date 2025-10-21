@@ -26,7 +26,10 @@
       "Bash(PORT=3003 pnpm dev:*)",
       "Bash(PORT=3005 pnpm dev:*)",
       "Bash(PORT=3006 pnpm dev:*)",
-      "Bash(PORT=3007 pnpm dev:*)"
+      "Bash(PORT=3007 pnpm dev:*)",
+      "Bash(awk:*)",
+      "Bash(xargs kill:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
